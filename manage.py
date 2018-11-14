@@ -9,8 +9,6 @@ def index():
 if __name__ == '__main__':
     app.run()
 
-
-<<<<<<< HEAD
 @app.route('/jinhaoLab3')
 def jinhaoLab3():
 	return 'This is Jinhao Liu lab3'
