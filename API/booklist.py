@@ -10,9 +10,3 @@ engine = create_engine(DATABASE_URL, echo=True)
 @book_list_bp.route("/book_list")
 def func():
     return 'Hello Book List!!!'
-
-@book_list_bp.route('/dummy')
-def dummy():
-    with engine.connect() as con:
-        rs = con.execute('insert into person(name, age) values(\'ggg\', 18)')
-        return "Success!"
