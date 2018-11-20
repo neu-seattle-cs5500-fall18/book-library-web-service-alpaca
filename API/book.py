@@ -20,3 +20,19 @@ def add_book():
 	connection.execute(insert_stmt,data)
 	connection.close()
     return "initial commit AnranBookBranch"
+
+@book_bp.route("/search_book")
+def search_book():
+ 	return "search book"
+
+
+@book_bp.route("/update_book")
+def update_book():
+	return "update book"
+
+@book.bp.route("/delete_book")
+def delete_book():
+	return "delete book"
+
+
+

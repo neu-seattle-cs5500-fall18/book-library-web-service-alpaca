@@ -11,7 +11,7 @@ class Book(db.Model):
     book_genre = db.Column(db.String,nullable=False)
 
     @property
-    def serialize(self):
+    def jsonfy(self):
         return {
             'id': self.book_id,
             'author': self.book_author,
