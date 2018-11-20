@@ -2,7 +2,7 @@ from application import db
 
 class BookList(db.Model):
 
-    __tablename__ = 'BookList'
+    __tablename__ = 'booklist'
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
