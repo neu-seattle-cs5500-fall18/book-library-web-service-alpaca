@@ -14,7 +14,5 @@ def func():
 @book_list_bp.route('/dummy')
 def dummy():
     with engine.connect() as con:
-        # 执行sql语句，如果是增删改，则直接生效，不需要commit
-        rs = con.execute('insert into person(name, age) values(\'hhh\', 18)')
-        data = rs.fetchone()[0]
+        rs = con.execute('insert into person(name, age) values(\'ggg\', 18)')
         return "Success!"
