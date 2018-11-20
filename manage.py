@@ -13,6 +13,10 @@ app.register_blueprint(book_list_bp)
 app.register_blueprint(loan_bp)
 app.register_blueprint(user_bp)
 
+@app.route('/')
+def main_page():
+    return 'Main Page!!!'
+
 if __name__ == '__main__':
     host = 'localhost'
     port = 9000
