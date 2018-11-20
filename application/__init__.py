@@ -1,7 +1,7 @@
-from application.API.book import book_bp
-from application.API.booklist import book_list_bp
-from application.API.loan import loan_bp
-from application.API.user import user_bp
+# from application.API.book import book_bp
+# from application.API.booklist import book_list_bp
+# from application.API.loan import loan_bp
+# from application.API.user import user_bp
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
@@ -11,7 +11,3 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://iltlntsqhnuuiu:b450237a15174
 
 db = SQLAlchemy(app)
 # register blueprints for different resources
-app.register_blueprint(book_bp)
-app.register_blueprint(book_list_bp)
-app.register_blueprint(loan_bp)
-app.register_blueprint(user_bp)
