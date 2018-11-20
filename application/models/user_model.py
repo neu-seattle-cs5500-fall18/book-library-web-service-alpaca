@@ -2,7 +2,7 @@ from application import db
 
 class User(db.Model):
 
-    __tablename__ = 'LibraryUser'
+    __tablename__ = 'libraryuser'
 
     UserId = db.Column(db.Integer, primary_key=True)
     UserName = db.Column(db.String(80), unique=True, nullable=False)

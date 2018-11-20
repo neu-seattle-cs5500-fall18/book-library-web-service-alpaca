@@ -4,7 +4,7 @@ from application.models.user_model import User
 
 class Loan(db.Model):
 
-    __tablename__ = 'Loan'
+    __tablename__ = 'loan'
 
     LoanId = db.Column(db.Integer, primary_key=True)
     BookId = db.Column(db.Integer, db.ForeignKey(Book.BookId), nullable=False)
