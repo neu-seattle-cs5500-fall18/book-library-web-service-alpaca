@@ -1,6 +1,10 @@
-from flask import Blueprint, request
+from flask import Blueprint
 from application import db
 book_bp = Blueprint('book', __name__)
+
+#insert
+# db.session.add()
+# db.session.commit()
 
 
 # @book_bp.route("/add_book")

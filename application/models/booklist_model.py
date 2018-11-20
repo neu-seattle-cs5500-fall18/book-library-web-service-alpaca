@@ -1,10 +1,8 @@
-from flask_sqlalchemy import SQLAlchemy
-# from application import app
-#
-# db = SQLAlchemy(app)
 from application import db
 
 class BookList(db.Model):
+
+    __tablename__ = 'BookList'
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
