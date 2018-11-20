@@ -1,7 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
-from application import app
-
-db = SQLAlchemy(app)
+# from application import app
+#
+# db = SQLAlchemy(app)
+from application import db
 
 class Loan(db.Model):
 
