@@ -1,4 +1,5 @@
 from flask import Blueprint
+from application import db
 
 user_bp = Blueprint('user', __name__)
 
