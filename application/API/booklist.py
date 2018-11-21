@@ -11,7 +11,7 @@ book_list_bp = Blueprint('book_list', __name__)
 
 @book_list_bp.route('/delete_book_from_list', methods=['POST'])
 def delete_book_from_list():
-    return 'hello delete!'
+    return 'hello delete!!!'
     # args = json.loads(request.get_data())  # get post args and trans to json format
     # try:
     #     user_id = args['user_id']
