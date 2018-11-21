@@ -4,7 +4,7 @@ class Book(db.Model):
 
     __tablename__ = 'book'
 
-    book_id = db.Column(db.String, primary_key=True)
+    id = db.Column(db.String, primary_key=True)
     book_author = db.Column(db.String,nullable=False)
     book_title = db.Column(db.String, nullable=False)
     book_year = db.Column(db.Integer, nullable=False)

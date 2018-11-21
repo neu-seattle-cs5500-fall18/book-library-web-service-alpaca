@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from application import db
 from application.models.booklist_model import BookList
 from application.models.booklist_model import BookListToBook
+from application.models.book_model import Book
 
 import json
 import time
@@ -26,15 +27,17 @@ def get_book_list():
             'message': 'Please check the arguments!'
         }), 400
 
-    book_ids = db.session.query(BookListToBook.book_id)\
-        .join(BookList, BookListToBook.book_list_id==BookList.id)\
+    # join 3 tables: book, booklisttobook, booklist together
+    books = db.session.query(Book)\
+        .join(BookListToBook, Book.id==BookListToBook.book_id)\
+        .join(BookList, BookList.id==BookListToBook.book_list_id)\
         .filter(BookList.name==list_name)\
         .filter(BookList.user_id==user_id)
 
-    book_ids = [each[0] for each in book_ids]
+    books = [{'author': book[1], 'year': book[2], 'title': book[3], 'genre': book[4]} for book in books]
     return jsonify({
         'message': 'Here are the book ids of the book {}'.format(list_name),
-        'book_ids': book_ids
+        'book_ids': books
     }), 200
 
 
