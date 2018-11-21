@@ -1,12 +1,8 @@
-from flask import Blueprint,Flask, jsonify, request
-from sqlalchemy import create_engine
-from models.book_model import *
+from flask import Blueprint
+from application import db
+from application.models.book_model import Book
 
 book_bp = Blueprint('book', __name__)
-
-#DATABASE_URL = 'postgres://iltlntsqhnuuiu:b450237a15174db6eddf51d8af1e8fc1a8eb71509c6277560f04c1c876c4542c@ec2-54-163-230-178.compute-1.amazonaws.com:5432/dhdp0qr21t6ev'
-DB_LOCAL = ''
-engine = create_engine(DB_LOCAL, echo=True)
 
 @book_bp.route("/add_book", methods=['POST'])
 def add_book():

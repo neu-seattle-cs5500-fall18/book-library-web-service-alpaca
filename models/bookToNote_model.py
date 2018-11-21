@@ -1,17 +1,21 @@
-from flask_sqlalchemy import SQLAlchemy
+from application import db
 
-db = SQLAlchemy()
+class BookToNote(db.Model):
 
-class BookToNotes(db.Model):
+	__tablename__ = 'booktonote'
 
-    BookToNoteId = db.Column(db.String, primary_key=True)
-    BookId = db.Column(db.String, db.ForeignKey(Book.BookId), nullable=False)
-    NoteId = db.Column(db.String, db.ForeignKey(Note.NoteId), nullable=False)
+    book_to_note_id = db.Column(db.String, primary_key=True)
+    book_id = db.Column(db.String, db.ForeignKey(Book.book_id), nullable=False)
+    note_id = db.Column(db.String, db.ForeignKey(Note.note_id), nullable=False)
+
+    def __init__(self, book_id, note_id):
+    	self.book_id = book_id
+    	self.note_id = note_id
 
     @property
     def serialize(self):
         return {
-        'BookToNoteId':self.BookToNoteId,
-        'BookId':self.BookId,
-        'NoteId':self.NoteId
+        'book_to_note_id':self.book_to_note_id,
+        'book_id':self.book_id,
+        'note_id':self.note_id
         }
