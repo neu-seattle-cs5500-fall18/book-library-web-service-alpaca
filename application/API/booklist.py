@@ -11,7 +11,10 @@ book_list_bp = Blueprint('book_list', __name__)
 
 @book_list_bp.route('/delete_book_from_list', methods=['POST'])
 def delete_book_from_list():
-    # return 'hello delete!!!'
+    '''
+    Delete a book from the book list given user_id, list_name and book_id.
+    @author: haoxiang.ma
+    '''
     args = json.loads(request.get_data())  # get post args and trans to json format
     try:
         user_id = args['user_id']
@@ -29,14 +32,12 @@ def delete_book_from_list():
             'message': 'No such book!'
         }), 400
 
+    # delete the record from table booklisttobook
     db.session.query(BookListToBook)\
         .filter(BookListToBook.book_list_id==book_list_id)\
         .filter(BookListToBook.book_id==book_id)\
         .delete()
     db.session.commit()
-    # record = BookListToBook(book_list_id, book_id)
-    # db.session.delete(record)
-    # db.session.commit()
     return jsonify({
         'message': 'Book(id:{}) is deleted from {}'.format(book_id, list_name)
     }), 200
