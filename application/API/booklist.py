@@ -35,7 +35,7 @@ def get_book_list():
         .filter(BookList.user_id==user_id)\
         .all()
 
-    books = [{'author': book[1], 'year': book[2], 'title': book[3], 'genre': book[4]} for book in books]
+    books = [{'author': book.author, 'year': book.year, 'title': book.title, 'genre': book.genre} for book in books]
     return jsonify({
         'message': 'Here are the book ids of the book {}'.format(list_name),
         'book_ids': books
