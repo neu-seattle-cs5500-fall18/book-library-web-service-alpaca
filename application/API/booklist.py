@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from application import db
 from application.models.booklist_model import BookList
+from application.models.booklist_model import BookListToBook
+
 import json
 import time
 
@@ -16,7 +18,25 @@ def add_book_to_list():
 
 @book_list_bp.route('/get_book_list', methods=['GET'])
 def get_book_list():
-    pass
+    try:
+        user_id = request.args.get('user_id')
+        list_name = request.args.get('list_name')
+    except:
+        return jsonify({
+            'message': 'Please check the arguments!'
+        }), 400
+
+    book_ids = db.session.query(BookListToBook.book_id)\
+        .join(BookList, BookListToBook.book_list_id==BookList.id)\
+        .filter(BookList.name==list_name)\
+        .filter(BookList.user_id==user_id)
+
+    book_ids = [each[0] for each in book_ids]
+    return jsonify({
+        'message': 'Here are the book ids of the book {}'.format(list_name),
+        'book_ids': book_ids
+    }), 200
+
 
 @book_list_bp.route('/delete_book_list', methods=['DELETE'])
 def delete_book_list():
