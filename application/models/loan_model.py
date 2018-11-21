@@ -1,8 +1,10 @@
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from application import db
+from application.models.book_model import Book
+from application.models.user_model import User
 
 class Loan(db.Model):
+
+    __tablename__ = 'loan'
 
     LoanId = db.Column(db.Integer, primary_key=True)
     BookId = db.Column(db.Integer, db.ForeignKey(Book.BookId), nullable=False)
