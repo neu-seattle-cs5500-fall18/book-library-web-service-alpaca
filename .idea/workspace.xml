@@ -83,12 +83,10 @@
       <file leaf-file-name="booklist.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/application/API/booklist.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="501">
-              <caret line="41" column="11" lean-forward="false" selection-start-line="41" selection-start-column="11" selection-end-line="41" selection-end-column="11" />
+            <state relative-caret-position="202">
+              <caret line="31" column="28" lean-forward="false" selection-start-line="31" selection-start-column="28" selection-end-line="31" selection-end-column="28" />
               <folding>
                 <element signature="e#0#45#0" expanded="true" />
-                <marker date="1542760722000" expanded="true" signature="1043:1128" ph="..." />
-                <marker date="1542760722000" expanded="true" signature="1059:1128" ph="..." />
               </folding>
             </state>
           </provider>
@@ -600,12 +598,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/application/API/booklist.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="501">
-          <caret line="41" column="11" lean-forward="false" selection-start-line="41" selection-start-column="11" selection-end-line="41" selection-end-column="11" />
+        <state relative-caret-position="202">
+          <caret line="31" column="28" lean-forward="false" selection-start-line="31" selection-start-column="28" selection-end-line="31" selection-end-column="28" />
           <folding>
             <element signature="e#0#45#0" expanded="true" />
-            <marker date="1542760722000" expanded="true" signature="1043:1128" ph="..." />
-            <marker date="1542760722000" expanded="true" signature="1059:1128" ph="..." />
           </folding>
         </state>
       </provider>
