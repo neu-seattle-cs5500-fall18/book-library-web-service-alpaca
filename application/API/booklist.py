@@ -32,7 +32,8 @@ def get_book_list():
         .join(BookListToBook, Book.id==BookListToBook.book_id)\
         .join(BookList, BookList.id==BookListToBook.book_list_id)\
         .filter(BookList.name==list_name)\
-        .filter(BookList.user_id==user_id)
+        .filter(BookList.user_id==user_id)\
+        .all()
 
     books = [{'author': book[1], 'year': book[2], 'title': book[3], 'genre': book[4]} for book in books]
     return jsonify({
