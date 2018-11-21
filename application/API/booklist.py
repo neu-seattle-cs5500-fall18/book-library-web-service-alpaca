@@ -11,29 +11,30 @@ book_list_bp = Blueprint('book_list', __name__)
 
 @book_list_bp.route('/delete_book_from_list', methods=['POST'])
 def delete_book_from_list():
-    args = json.loads(request.get_data())  # get post args and trans to json format
-    try:
-        user_id = args['user_id']
-        list_name = args['list_name']
-        book_id = args['book_id']
-    except:
-        return jsonify({
-            'message': 'Please check the arguments!'
-        }), 400
-
-    try:
-        book_list_id = BookList.query.filter_by(name=list_name).filter_by(user_id=user_id).first().id
-    except:
-        return jsonify({
-            'message': 'No such book!'
-        }), 400
-
-    record = BookListToBook(book_list_id, book_id)
-    db.session.delete(record)
-    db.session.commit()
-    return jsonify({
-        'message': 'Book(id:{}) is deleted from {}'.format(book_id, list_name)
-    }), 200
+    return 'hello delete!'
+    # args = json.loads(request.get_data())  # get post args and trans to json format
+    # try:
+    #     user_id = args['user_id']
+    #     list_name = args['list_name']
+    #     book_id = args['book_id']
+    # except:
+    #     return jsonify({
+    #         'message': 'Please check the arguments!'
+    #     }), 400
+    #
+    # try:
+    #     book_list_id = BookList.query.filter_by(name=list_name).filter_by(user_id=user_id).first().id
+    # except:
+    #     return jsonify({
+    #         'message': 'No such book!'
+    #     }), 400
+    #
+    # record = BookListToBook(book_list_id, book_id)
+    # db.session.delete(record)
+    # db.session.commit()
+    # return jsonify({
+    #     'message': 'Book(id:{}) is deleted from {}'.format(book_id, list_name)
+    # }), 200
 
 @book_list_bp.route('/add_book_to_list', methods=['PUT'])
 def add_book_to_list():
@@ -66,7 +67,7 @@ def get_book_list():
     books = [{'author': book.author, 'year': book.year, 'title': book.title, 'genre': book.genre} for book in books]
     return jsonify({
         'message': 'Here are the book ids of the book {}'.format(list_name),
-        'book_ids': books
+        'books': books
     }), 200
 
 @book_list_bp.route('/delete_book_list', methods=['DELETE'])
