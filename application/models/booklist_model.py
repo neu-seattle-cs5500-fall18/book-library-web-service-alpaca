@@ -34,6 +34,10 @@ class BookListToBook(db.Model):
     book_list_id = db.Column(db.Integer, nullable=False)
     book_id = db.Column(db.Integer, nullable=False)
 
+    def __init__(self, book_list_id, book_id):
+        self.book_list_id = book_list_id
+        self.book_id = book_id
+
     @property
     def serialize(self):
         return {
