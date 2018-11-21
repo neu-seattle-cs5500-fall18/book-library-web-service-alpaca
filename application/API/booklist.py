@@ -29,9 +29,14 @@ def delete_book_from_list():
             'message': 'No such book!'
         }), 400
 
-    record = BookListToBook(book_list_id, book_id)
-    db.session.delete(record)
+    db.session.query(BookListToBook)\
+        .filter(BookListToBook.book_list_id==book_list_id)\
+        .filter(BookListToBook.book_id==book_id)\
+        .delete()
     db.session.commit()
+    # record = BookListToBook(book_list_id, book_id)
+    # db.session.delete(record)
+    # db.session.commit()
     return jsonify({
         'message': 'Book(id:{}) is deleted from {}'.format(book_id, list_name)
     }), 200
