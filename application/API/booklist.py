@@ -19,7 +19,12 @@ def add_book_to_list():
 
 @book_list_bp.route('/get_book_list', methods=['GET'])
 def get_book_list():
+    '''
+    Get books from a book list given user_id & book_list_name.
+    @author: haoxiang.ma
+    '''
     try:
+        # get specific args
         user_id = request.args.get('user_id')
         list_name = request.args.get('list_name')
     except:
@@ -27,7 +32,8 @@ def get_book_list():
             'message': 'Please check the arguments!'
         }), 400
 
-    # join 3 tables: book, booklisttobook, booklist together
+    # join three tables together: book, booklisttobook, booklist
+    # to get book info
     books = db.session.query(Book)\
         .join(BookListToBook, Book.id==BookListToBook.book_id)\
         .join(BookList, BookList.id==BookListToBook.book_list_id)\
@@ -41,7 +47,6 @@ def get_book_list():
         'book_ids': books
     }), 200
 
-
 @book_list_bp.route('/delete_book_list', methods=['DELETE'])
 def delete_book_list():
     pass
@@ -49,6 +54,10 @@ def delete_book_list():
 # API for creating book list
 @book_list_bp.route('/create_book_list', methods=['POST'])
 def create_book_list():
+    '''
+    Create a book list given user_id, book_list_name and description.
+    @author haoxiang.ma
+    '''
     args = json.loads(request.get_data())   # get post args and trans to json format
     try:
         # get specific args
