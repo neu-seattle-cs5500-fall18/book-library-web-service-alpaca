@@ -13,12 +13,6 @@ def add_book():
         book_title = args['book_title']
         book_year = args['book_year']
         book_genre = args['book_genre']
-        '''
-        book_author = "Conan"
-        book_title = "Sherlock"
-        book_year = 1890
-        book_genre = "Mystery"
-        '''
     except:
         return jsonify({
             'message': 'invalid input arguments!'

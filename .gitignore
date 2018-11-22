@@ -1,3 +1,4 @@
 .idea/
 application/__pycache__
 application/API/__pycache__
+application/models/__pycache__/
