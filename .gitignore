@@ -1,1 +1,10 @@
 .idea/
+application/__pycache__
+application/API/__pycache__
+.idea/book-library-web-service-alpaca.iml
+.idea/encodings.xml
+.idea/workspace.xml
+.idea/misc.xml
+.idea/book-library-web-service-alpaca.iml
+*.iml
+*.xml
