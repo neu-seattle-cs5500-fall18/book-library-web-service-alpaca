@@ -49,6 +49,38 @@ def delete_book():
         'message': 'book deleted'
     }), 200
 
+
 @book_bp.route('/search_book', methods=['GET'])
 def search_book():
-    return "this is search book"
+    book_id = request.args.get('book_id')
+    book_author = request.args.get('author')
+    start_year = request.args.get('start_year')
+    end_year = request.args.get('end_year')
+    book_title = request.args.get('title')
+    book_genre = request.args.get('genre')
+
+    conditions = []
+    if book_id is not None:   # if book_id given,should only need 1 condition for the query
+        conditions.append(Book.id == book_id)
+    else:
+        if book_author is not None:
+            conditions.append(Book.author == book_author)
+
+        if start_year is not None:
+            conditions.append(Book.year >= start_year)
+
+        if end_year is not None:
+            conditions.append(Book.year <= end_year)
+
+        if book_title is not None:
+            conditions.append(Book.title == book_title)
+
+        if book_genre is not None:
+            conditions.append(Book.genre == book_genre)
+
+    books = db.session.query(Book).filter(*conditions).all()
+    books = [{'id': book.id, 'author': book.author, 'title': book.title, 'year': book.year, 'genre': book.genre} for book in books]
+    return jsonify({
+        'message': 'Query successful',
+        'books': books
+    }), 200
