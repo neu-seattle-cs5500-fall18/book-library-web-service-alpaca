@@ -8,3 +8,4 @@ application/API/__pycache__
 .idea/book-library-web-service-alpaca.iml
 *.iml
 *.xml
+.idea/workspace.xml
