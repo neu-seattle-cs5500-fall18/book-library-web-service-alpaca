@@ -16,7 +16,6 @@ class Book(db.Model):
         self.year = book_year
         self.genre = book_genre
 
-        
     @property
     def serialize(self):
         return {
