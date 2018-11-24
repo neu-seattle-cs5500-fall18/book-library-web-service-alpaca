@@ -44,7 +44,31 @@ def delete_book_from_list():
 
 @book_list_bp.route('/add_book_to_list', methods=['PUT'])
 def add_book_to_list():
-    pass
+    '''
+    Add a book to the book list.
+    @author: haoxiang.ma
+    '''
+    try:
+        # get specific args
+        user_id = request.args.get('user_id')
+        list_name = request.args.get('list_name')
+        book_id = request.args.get('book_id')
+    except:
+        return jsonify({
+            'message': 'Please check the arguments!'
+        }), 400
+
+    book_list = db.session.query(BookList)\
+        .filter(BookList.user_id==user_id)\
+        .filter(BookList.name==list_name)\
+        .first()
+
+    record = BookListToBook(book_list.id, book_id)
+    db.session.add(record)
+    db.session.commit()
+    return jsonify({
+        'message': 'Add the book(id:{}) to the list \'{}\' successfully.'.format(book_id, list_name)
+    }), 200
 
 @book_list_bp.route('/get_book_list', methods=['GET'])
 def get_book_list():
@@ -78,7 +102,27 @@ def get_book_list():
 
 @book_list_bp.route('/delete_book_list', methods=['DELETE'])
 def delete_book_list():
-    pass
+    '''
+        Delete a book list.
+        @author: haoxiang.ma
+        '''
+    try:
+        # get specific args
+        user_id = request.args.get('user_id')
+        list_name = request.args.get('list_name')
+    except:
+        return jsonify({
+            'message': 'Please check the arguments!'
+        }), 400
+
+    db.session.query(BookList)\
+        .filter(BookList.user_id==user_id)\
+        .filter(BookList.name==list_name)\
+        .delete()
+    db.session.commit()
+    return jsonify({
+        'message': 'Delete book list \'{}\' (owned by user id:{}) successfully.'.format(list_name, user_id)
+    }), 200
 
 # API for creating book list
 @book_list_bp.route('/create_book_list', methods=['POST'])
