@@ -8,12 +8,6 @@ class Note(db.Model):
 	content = db.Column(db.Text, nullable=False)
 	created_at = db.Column(db.Date, nullable=False)
 
-	def __init__(self, book_id, user_id, content):
-		self.book_id = book_id
-		self.user_id = user_id
-		self.content = content
-
-
 	def __init__(self, book_id, user_id, content, created_at):
 		self.book_id = book_id
 		self.user_id = user_id

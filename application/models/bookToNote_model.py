@@ -1,7 +1,7 @@
 from application import db
 
 class BookToNote(db.Model):
-
+#这个BookToNote 应该不需要
 	__tablename__ = 'booktonote'
 
     book_to_note_id = db.Column(db.String, primary_key=True)

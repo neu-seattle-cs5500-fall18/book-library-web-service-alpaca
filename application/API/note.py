@@ -18,13 +18,13 @@ def add_note():
             'message': 'invalid input arguments!'
         }), 400
 
+    if book_id is None or user_id is None or content is None:
+        return jsonify({
+            'message': 'invalid input arguments!'
+        }), 400
+
     created_at = time.strftime('%Y/%m/%d', time.localtime())
-
-    if created_at is not None:
-        note = Note(book_id, user_id, content, created_at)
-    else:
-        note = Note(book_id, user_id, content)
-
+    note = Note(book_id, user_id, content, created_at)
     db.session.add(note)
     db.session.commit()
     return jsonify({
@@ -104,4 +104,28 @@ def update_note():
     db.session.commit()
     return jsonify({
         'message': 'Note updated'
+    }), 200
+
+
+@note_bp.route('/search_note', methods=['GET'])
+def search_note():
+    note_id = request.args.get('note_id')
+    book_id = request.args.get('book_id')
+    user_id = request.args.get('user_id')
+    conditions = []
+    if note_id is not None:  # if book_id given,should only need 1 condition for the query
+        conditions.append(Note.id == note_id)
+    else:
+        if book_id is not None:
+            conditions.append(Note.book_id == book_id)
+
+        if user_id is not None:
+            conditions.append(Note.user_id == user_id)
+
+    notes = db.session.query(Note).filter(*conditions).all()
+    notes = [{'id': note.id, 'book_id': note.book_id, 'user_id': note.user_id, 'content': note.content, 'created_at': note.created_at} for
+             note in notes]
+    return jsonify({
+        'message': 'Query successful',
+        'notes': notes
     }), 200
