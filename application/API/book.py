@@ -84,3 +84,50 @@ def search_book():
         'message': 'Query successful',
         'books': books
     }), 200
+
+@book_bp.route('/update_book', methods=['PUT'])
+def update_book():
+    try:
+        book_id = request.args.get('id')
+    except:
+        return jsonify({
+            'message':'Get arg failed'
+        }),400
+
+    book_author = request.args.get('author')
+    book_year = request.args.get('year')
+    book_title = request.args.get('title')
+    book_genre = request.args.get('genre')
+
+    if book_id is None:
+        return jsonify({
+            'message': 'Did not pass in a book_id'
+        }), 400
+
+    try:
+        book = db.session.query(Book).filter(Book.id == book_id).first()
+    except:
+        return jsonify({
+            'message': 'No such book to update'
+        }), 400
+    if book is None:
+        return jsonify({
+            'message': 'No such book to update'
+        }), 400
+
+    if book_author is not None:
+        book.author = book_author
+
+    if book_year is not None:
+        book.year = book_year
+
+    if book_title is not None:
+        book.title = book_title
+
+    if book_genre is not None:
+        book.genre = book_genre
+
+    db.session.commit()
+    return jsonify({
+        'message': 'Book updated'
+    }), 200
