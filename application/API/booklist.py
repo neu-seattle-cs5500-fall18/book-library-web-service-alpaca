@@ -1,4 +1,3 @@
-from flask import jsonify
 from application import db
 from application.models.booklist_model import BookList
 from application.models.booklist_model import BookListToBook
@@ -35,10 +34,10 @@ class BookLists(Resource):
             .all()
 
         books = [{'author': book.author, 'year': book.year, 'title': book.title, 'genre': book.genre} for book in books]
-        return jsonify({
+        return {
             'message': 'Here are the book ids of the book {}'.format(list_name),
             'books': books
-        }), 200
+        }, 200
 
     @book_list_apis.doc(responses={200: 'Success', 400: 'Error'})
     @book_list_apis.doc(params={'user_id': 'user id'})
@@ -55,9 +54,9 @@ class BookLists(Resource):
             .filter(BookList.name == list_name) \
             .delete()
         db.session.commit()
-        return jsonify({
+        return {
             'message': 'Delete book list \'{}\' (owned by user id:{}) successfully.'.format(list_name, user_id)
-        }), 200
+        }, 200
 
     @book_list_apis.doc(responses={201: 'Success', 401: 'Error'})
     @book_list_apis.doc(params={'user_id': 'user id'})
@@ -75,9 +74,9 @@ class BookLists(Resource):
         book_list = BookList(user_id, list_name, description, created_at)
         db.session.add(book_list)
         db.session.commit()
-        return jsonify({
+        return {
             'message': 'Create book {} successfully.'.format(list_name)
-        }), 200
+        }, 200
 
 @book_list_apis.route('/books')
 class BookListsToBooks(Resource):
@@ -97,9 +96,9 @@ class BookListsToBooks(Resource):
         try:
             book_list_id = BookList.query.filter_by(name=list_name).filter_by(user_id=user_id).first().id
         except:
-            return jsonify({
+            return {
                 'message': 'No such book!'
-            }), 400
+            }, 400
 
         # delete the record from table booklisttobook
         db.session.query(BookListToBook) \
@@ -107,9 +106,9 @@ class BookListsToBooks(Resource):
             .filter(BookListToBook.book_id == book_id) \
             .delete()
         db.session.commit()
-        return jsonify({
+        return {
             'message': 'Book(id:{}) is deleted from {}'.format(book_id, list_name)
-        }), 200
+        }, 200
 
     @book_list_apis.doc(responses={201: 'Success', 401: 'Error'})
     @book_list_apis.doc(params={'user_id': 'user id'})
@@ -131,9 +130,9 @@ class BookListsToBooks(Resource):
         record = BookListToBook(book_list.id, book_id)
         db.session.add(record)
         db.session.commit()
-        return jsonify({
+        return {
             'message': 'Add the book(id:{}) to the list \'{}\' successfully.'.format(book_id, list_name)
-        }), 200
+        }, 200
 
 
 ########################################################################################################
