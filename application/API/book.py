@@ -1,133 +1,180 @@
-from flask import Blueprint, request, jsonify
+from flask_restplus import Namespace, Resource, reqparse
 from application import db
 from application.models.book_model import Book
-import json
 
-book_bp = Blueprint('book', __name__)
+book_apis = Namespace('Book APIs', description='Book APIs')
 
-@book_bp.route('/add_book', methods=['POST'])
-def add_book():
-    args = json.loads(request.get_data())  # get post args and trans to json format
-    try:
+parser = reqparse.RequestParser()
+parser.add_argument('book_id', help='book id')
+parser.add_argument('book_author', help='book author')
+parser.add_argument('book_title', help='book title')
+parser.add_argument('book_year', help='publish year of the book')
+parser.add_argument('book_genre', help='book genre')
+parser.add_argument('start_year', help='Starting publish year of the book')
+parser.add_argument('end_year', help='Ending publish year of the book')
+
+@book_apis.route('/')
+class BookDao(Resource):
+
+    @book_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @book_apis.doc(params={'book_id': 'book id'})
+    @book_apis.doc(params={'book_author': 'book author'})
+    @book_apis.doc(params={'book_title': 'book title'})
+    @book_apis.doc(params={'start_year': 'Starting publish year of the book'})
+    @book_apis.doc(params={'end_year': 'Ending publish year of the book'})
+    @book_apis.doc(params={'book_genre': 'book genre'})
+    @book_apis.doc('get book info')
+    def get(self):
+        '''Search book by parameters'''
+        args = parser.parse_args()
+        book_id = args['book_id']
         book_author = args['book_author']
+        start_year = args['start_year']
+        end_year = args['end_year']
         book_title = args['book_title']
-        book_year = args['book_year']
         book_genre = args['book_genre']
-    except:
-        return jsonify({
-            'message': 'invalid input arguments!'
-        }), 400
+        conditions = []
+        if book_id is not None:  # if book_id given,should only need 1 condition for the query
+            conditions.append(Book.id == book_id)
+        else:
+            if book_author is not None:
+                conditions.append(Book.author == book_author)
 
-    book = Book(book_author, book_title, book_year, book_genre)
-    db.session.add(book)
-    db.session.commit()
-    return jsonify({
-        'message': 'book inserted'
-    }), 201
+            if start_year is not None:
+                conditions.append(Book.year >= start_year)
 
+            if end_year is not None:
+                conditions.append(Book.year <= end_year)
 
-@book_bp.route('/delete_book', methods=['DELETE'])
-def delete_book():
-    args = json.loads(request.get_data())
-    try:
-        target_id = args['book_id']
-    except:
-        return jsonify({
-            'message': 'invalid input argument'
-        }),400
+            if book_title is not None:
+                conditions.append(Book.title == book_title)
 
-    try:
-        book_to_delete = db.session.query(Book).filter_by(id=target_id).first()
-    except:
-        return jsonify({
-            'message': 'no such book to delete'
-        }),401
+            if book_genre is not None:
+                conditions.append(Book.genre == book_genre)
 
-    db.session.delete(book_to_delete)
-    db.session.commit()
-    return jsonify({
-        'message': 'book deleted'
-    }), 200
+        books = db.session.query(Book).filter(*conditions).all()
+        books = [{'id': book.id, 'author': book.author, 'title': book.title, 'year': book.year, 'genre': book.genre} for
+                 book in books]
+        return {
+            'message': 'Query successful',
+            'books': books
+        }, 200
 
 
-@book_bp.route('/search_book', methods=['GET'])
-def search_book():
-    book_id = request.args.get('book_id')
-    book_author = request.args.get('author')
-    start_year = request.args.get('start_year')
-    end_year = request.args.get('end_year')
-    book_title = request.args.get('title')
-    book_genre = request.args.get('genre')
+    @book_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @book_apis.doc(params={'book_id': 'book id'})
+    @book_apis.doc('Delete book')
+    def delete(self):
+        '''Delete a book by book_id'''
+        args = parser.parse_args()
+        try:
+            book_id = args['book_id']
+        except:
+            return {
+                'message': 'Did not give book_id'
+            }, 400
 
-    conditions = []
-    if book_id is not None:   # if book_id given,should only need 1 condition for the query
-        conditions.append(Book.id == book_id)
-    else:
+        if book_id is None:
+            return {
+                'message': 'Did not pass in a book_id'
+            }, 400
+
+        try:
+            book_to_delete = db.session.query(Book).filter(Book.id==book_id)
+        except:
+            return {
+                'message': 'no such book to delete'
+            }, 400
+        if book_to_delete is None:
+            return {
+                'message': 'no such book to delete'
+            }, 400
+
+        book_to_delete.delete()
+        db.session.commit()
+        return {
+            'message': 'book deleted'
+        }, 200
+
+
+    @book_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @book_apis.doc(params={'book_author': 'book author'})
+    @book_apis.doc(params={'book_title': 'book title'})
+    @book_apis.doc(params={'book_year': 'book publish year'})
+    @book_apis.doc(params={'book_genre': 'book genre'})
+    @book_apis.doc('Create a book')
+    def post(self):
+        '''Add a book'''
+        args = parser.parse_args()
+        try:
+            book_author = args['book_author']
+            book_title = args['book_title']
+            book_year = args['book_year']
+            book_genre = args['book_genre']
+        except:
+            return {
+                'message': 'At least 1 argument is not provided'
+            }, 400
+
+        book = Book(book_author, book_title, book_year, book_genre)
+        db.session.add(book)
+        db.session.commit()
+        return {
+            'message': 'Book created'
+        }, 200
+
+    @book_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @book_apis.doc(params={'book_id': 'book id'})
+    @book_apis.doc(params={'book_author': 'book author'})
+    @book_apis.doc(params={'book_title': 'book title'})
+    @book_apis.doc(params={'book_year': 'book publish year'})
+    @book_apis.doc(params={'book_genre': 'book genre'})
+    @book_apis.doc('Update a book')
+    def put(self):
+        '''Update a book'''
+        args = parser.parse_args()
+        try:
+            book_id = args['book_id']
+        except:
+            return {
+                'message': 'Get book id failed'
+            }, 400
+
+        if book_id is None:
+            return {
+                'message': 'Did not pass in a book_id'
+            }, 400
+
+        book_author = args['book_author']
+        book_year = args['book_year']
+        book_title = args['book_title']
+        book_genre = args['book_genre']
+
+        try:
+            book = db.session.query(Book).filter(Book.id == book_id).first()
+        except:
+            return {
+                'message': 'No such book to update'
+            }, 400
+
+        if book is None:
+            return {
+                'message': 'No such book to update'
+            }, 400
+
         if book_author is not None:
-            conditions.append(Book.author == book_author)
+            book.author = book_author
 
-        if start_year is not None:
-            conditions.append(Book.year >= start_year)
-
-        if end_year is not None:
-            conditions.append(Book.year <= end_year)
+        if book_year is not None:
+            book.year = book_year
 
         if book_title is not None:
-            conditions.append(Book.title == book_title)
+            book.title = book_title
 
         if book_genre is not None:
-            conditions.append(Book.genre == book_genre)
+            book.genre = book_genre
 
-    books = db.session.query(Book).filter(*conditions).all()
-    books = [{'id': book.id, 'author': book.author, 'title': book.title, 'year': book.year, 'genre': book.genre} for book in books]
-    return jsonify({
-        'message': 'Query successful',
-        'books': books
-    }), 200
-
-@book_bp.route('/update_book', methods=['PUT'])
-def update_book():
-    try:
-        book_id = request.args.get('id')
-    except:
-        return jsonify({
-            'message':'Get arg failed'
-        }),400
-
-    book_author = request.args.get('author')
-    book_year = request.args.get('year')
-    book_title = request.args.get('title')
-    book_genre = request.args.get('genre')
-
-    if book_id is None:
-        return jsonify({
-            'message': 'Did not pass in a book_id'
-        }), 400
-
-    try:
-        book = db.session.query(Book).filter(Book.id == book_id).first()
-    except:
-        return jsonify({
-            'message': 'No such book to update'
-        }), 400
-    if book is None:
-        return jsonify({
-            'message': 'No such book to update'
-        }), 400
-
-    if book_author is not None:
-        book.author = book_author
-
-    if book_year is not None:
-        book.year = book_year
-
-    if book_title is not None:
-        book.title = book_title
-
-    if book_genre is not None:
-        book.genre = book_genre
-
-    db.session.commit()
-    return jsonify({
-        'message': 'Book updated'
-    }), 200
+        db.session.commit()
+        return {
+            'message': 'Book updated'
+        }, 200

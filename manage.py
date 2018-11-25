@@ -1,6 +1,8 @@
 from application import app
 from flask_restplus import Api
 from application.API.booklist import book_list_apis
+from application.API.book import book_apis
+from application.API.note import note_apis
 
 # init API
 book_library_service_api = Api(
@@ -11,6 +13,8 @@ book_library_service_api = Api(
 
 # add individual namespaces to the API
 book_library_service_api.add_namespace(ns=book_list_apis, path='/booklist')
+book_library_service_api.add_namespace(ns=book_apis, path='/book')
+book_library_service_api.add_namespace(ns=note_apis, path='/note')
 
 # combine the application with the API
 book_library_service_api.init_app(app)
