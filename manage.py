@@ -3,6 +3,7 @@ from flask_restplus import Api
 from application.API.booklist import book_list_apis
 from application.API.book import book_apis
 from application.API.note import note_apis
+from application.API.loan import loan_apis
 
 # init API
 book_library_service_api = Api(
