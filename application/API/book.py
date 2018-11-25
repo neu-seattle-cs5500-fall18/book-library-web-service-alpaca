@@ -91,7 +91,6 @@ class BookDao(Resource):
             }, 400
 
         book_to_delete.delete()
-        #db.session.delete(book_to_delete)
         db.session.commit()
         return {
             'message': 'book deleted'
