@@ -4,6 +4,7 @@ from application.API.booklist import book_list_apis
 from application.API.book import book_apis
 from application.API.note import note_apis
 from application.API.loan import loan_apis
+from application.API.user import user_apis
 
 # init API
 book_library_service_api = Api(
@@ -17,6 +18,7 @@ book_library_service_api.add_namespace(ns=book_list_apis, path='/booklist')
 book_library_service_api.add_namespace(ns=book_apis, path='/book')
 book_library_service_api.add_namespace(ns=note_apis, path='/note')
 book_library_service_api.add_namespace(ns=loan_apis, path='/loan')
+book_library_service_api.add_namespace(ns = user_apis, path='/user')
 
 # combine the application with the API
 book_library_service_api.init_app(app)
