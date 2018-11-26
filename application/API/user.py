@@ -23,7 +23,7 @@ class Users(Resource):
 
         try:
             user = db.session.query(User) \
-                .filter(User.name == user_name) \
+                .filter(User.user_name == user_name) \
                 .filter(User.password == password) \
                 .first()
         except:
