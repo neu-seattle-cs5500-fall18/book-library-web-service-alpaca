@@ -1,14 +1,15 @@
-DROP TABLE IF EXISTS LibraryUser;
-DROP TABLE IF EXISTS Book;
 DROP TABLE IF EXISTS Note;
 DROP TABLE IF EXISTS BookList;
 DROP TABLE IF EXISTS BookListToBook;
 DROP TABLE IF EXISTS Loan;
+DROP TABLE IF EXISTS Book;
+DROP TABLE IF EXISTS LibraryUser;
 
 CREATE TABLE LibraryUser (
 	id SERIAL PRIMARY KEY,
 	user_name varchar(32) not null unique,
-	password varchar(32) not null
+	password varchar(32) not null,
+	email varchar(255)
 );
 
 CREATE TABLE Book (
