@@ -58,4 +58,3 @@ CREATE TABLE Loan (
 );
 
 
-

@@ -64,3 +64,4 @@ class Users(Resource):
         return {
                    'message': 'The user name \'{}\' exists! Please use another name!'.format(user_name)
                }, 401
+
