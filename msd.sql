@@ -26,8 +26,8 @@ CREATE TABLE Note (
 	user_id int,
 	content text,
 	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
-	foreign key (book_id) references Book(id),
-	foreign key (user_id) references LibraryUser(id)
+	foreign key (book_id) references Book(id) ON DELETE SET NULL,
+	foreign key (user_id) references LibraryUser(id) ON DELETE SET NULL
 );
 
 CREATE TABLE BookList (
@@ -36,15 +36,15 @@ CREATE TABLE BookList (
 	name varchar(255) not null,
 	description text,
 	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
-	foreign key (user_id) references LibraryUser(id)
+	foreign key (user_id) references LibraryUser(id) ON DELETE SET NULL
 );
 
 CREATE TABLE BookListToBook (
 	id SERIAL PRIMARY KEY,
 	book_list_id int,
 	book_id int,
-	foreign key (book_id) references Book(id),
-	foreign key (book_list_id) references BookList(id)
+	foreign key (book_id) references Book(id) ON DELETE SET NULL,
+	foreign key (book_list_id) references BookList(id) ON DELETE SET NULL
 );
 
 CREATE TABLE Loan (
@@ -53,8 +53,8 @@ CREATE TABLE Loan (
 	book_id int,
 	due date not null,
 	return_date date,
-	foreign key (user_id) references LibraryUser(id),
-	foreign key (book_id) references Book(id)
+	foreign key (user_id) references LibraryUser(id) ON DELETE SET NULL,
+	foreign key (book_id) references Book(id) ON DELETE SET NULL
 );
 
 
