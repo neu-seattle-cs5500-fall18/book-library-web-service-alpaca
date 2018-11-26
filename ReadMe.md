@@ -4,6 +4,10 @@
 
     This is the repo of the book library service built by Team Alpaca.
 
+2. Quick Start
+
+   Our service endpoint: [https://alpaca-book-library-service.herokuapp.com/](https://alpaca-book-library-service.herokuapp.com/)
+
 2. Dev Tools
     
     + Python 3.6.0

@@ -26,16 +26,22 @@ class BookList(db.Model):
             'created_at': self.created_at
         }
 
-# class BookListToBook(db.Model):
-#
-#     id = db.Column(db.Integer, primary_key=True)
-#     book_list_id = db.Column(db.Integer, nullable=False)
-#     book_id = db.Column(db.Integer, nullable=False)
-#
-#     @property
-#     def serialize(self):
-#         return {
-#             'id': self.id,
-#             'list_id': self.book_list_id,
-#             'book_id': self.book_id
-#         }
+class BookListToBook(db.Model):
+
+    __tablename__ = 'booklisttobook'
+
+    id = db.Column(db.Integer, primary_key=True)
+    book_list_id = db.Column(db.Integer, nullable=False)
+    book_id = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, book_list_id, book_id):
+        self.book_list_id = book_list_id
+        self.book_id = book_id
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'list_id': self.book_list_id,
+            'book_id': self.book_id
+        }
