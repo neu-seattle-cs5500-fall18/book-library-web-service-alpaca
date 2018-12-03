@@ -20,21 +20,28 @@ class Users(Resource):
         args = parser.parse_args()
         user_name = args['user_name']
         password = args['password']
+        user = db.session.query(User).filter(User.user_name == user_name).first()
 
-        try:
-            user = db.session.query(User) \
-                .filter(User.user_name == user_name) \
-                .filter(User.password == password) \
-                .first()
-        except:
+        if user is None:
             return {
-                'message': 'Log in error! Please check your username or password!'
+                'message': 'Sign in error! No such user name!'
             }, 400
 
-        if user is not None:
+        else:
+            if password != user.password:
+                return {
+                    'message': 'Sign in error! Incorrect password!'
+                }, 400
+
+            user_id = user.id
+            name = user.user_name
+            email = user.email
             return {
-                       'message': 'User \'{}\' logs in successfully.'.format(user_name)
-                   }, 200
+                'message': 'Sign in successful',
+                'user id': user_id,
+                'user name': name,
+                'user email': email
+            }, 200
 
     @user_apis.doc(responses={201: 'Success', 401: 'Error'})
     @user_apis.doc(params={'user_name': 'user name'})
@@ -48,20 +55,18 @@ class Users(Resource):
         password = args['password']
         email = args['email']
 
-        try:
-            user_name = db.session.query(User) \
-                .filter(User.name == user_name) \
-                .first()\
-                .name
-        except:
-            new_user = User(user_name, password, email)
-            db.session.add(new_user)
-            db.session.commit()
+        user = db.session.query(User).filter(User.user_name == user_name).first()
+        if user is not None:
             return {
-                       'message': 'User \'{}\' signs up successfully.'.format(user_name)
-                   }, 201
+                'message': 'This user name already exists. Please use a different user name'
+            }, 401
 
+        new_user = User(user_name, password, email)
+        db.session.add(new_user)
+        db.session.commit()
         return {
-                   'message': 'The user name \'{}\' exists! Please use another name!'.format(user_name)
-               }, 401
-
+            'message': 'Sign up successful',
+            'user id': new_user.id,
+            'user name': user_name,
+            'user email': email
+        }, 201

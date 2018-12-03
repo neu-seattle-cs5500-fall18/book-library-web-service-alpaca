@@ -17,9 +17,9 @@ class User(db.Model):
     @property
     def serialize(self):
         return {
-            'id': self.book_list_id,
-            'name': self.book_list_name,
-            'user_name': self.user_name
+            'user_id': self.id,
+            'user_name': self.user_name,
+            'email': self.email
         }
 
 
