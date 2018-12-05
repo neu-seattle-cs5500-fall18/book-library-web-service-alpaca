@@ -52,7 +52,18 @@ class BookDao(Resource):
             if book_genre is not None:
                 conditions.append(Book.genre == book_genre)
 
-        books = db.session.query(Book).filter(*conditions).all()
+        try:
+            books = db.session.query(Book).filter(*conditions).all()
+        except:
+            return {
+                'message': 'No matching book'
+            }, 400
+
+        if books is None:
+            return {
+                'message': 'No matching book'
+            }, 400
+
         books = [{'id': book.id, 'author': book.author, 'title': book.title, 'year': book.year, 'genre': book.genre} for
                  book in books]
         return {
@@ -112,6 +123,10 @@ class BookDao(Resource):
             book_year = args['book_year']
             book_genre = args['book_genre']
         except:
+            return {
+                'message': 'At least 1 argument is not provided'
+            }, 400
+        if book_author is None or book_title is None or book_year is None or book_genre is None:
             return {
                 'message': 'At least 1 argument is not provided'
             }, 400
