@@ -91,7 +91,7 @@ class BookDao(Resource):
             }, 400
 
         try:
-            book_to_delete = db.session.query(Book).filter(Book.id==book_id)
+            book_to_delete = db.session.query(Book).filter(Book.id == book_id).first()
         except:
             return {
                 'message': 'no such book to delete'
@@ -101,7 +101,7 @@ class BookDao(Resource):
                 'message': 'no such book to delete'
             }, 400
 
-        book_to_delete.delete()
+        db.session.query(Book).filter(Book.id == book_id).delete()
         db.session.commit()
         return {
             'message': 'book deleted'

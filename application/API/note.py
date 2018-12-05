@@ -35,8 +35,18 @@ class NoteDao(Resource):
 
             if user_id is not None:
                 conditions.append(Note.user_id == user_id)
+        try:
+            notes = db.session.query(Note).filter(*conditions).all()
+        except:
+            return{
+                'message': 'No Matching notes'
+            }, 400
 
-        notes = db.session.query(Note).filter(*conditions).all()
+        if not notes:
+            return {
+                'message': 'No Matching notes'
+            }, 400
+
         notes = [{'note_id': note.id, 'book_id': note.book_id, 'user_id': note.user_id, 'content': note.content} for
                  note in notes]
         return {
@@ -64,17 +74,17 @@ class NoteDao(Resource):
             }, 400
 
         try:
-            note_to_delete = db.session.query(Note).filter(Note.id==note_id)
+            note_to_delete = db.session.query(Note).filter(Note.id == note_id).first()
         except:
             return {
                 'message': 'no such note to delete'
-            }, 401
+            }, 400
         if note_to_delete is None:
             return {
                 'message': 'no such note to delete'
-            }, 401
+            }, 400
 
-        note_to_delete.delete()
+        db.session.query(Note).filter(Note.id == note_id).delete()
         db.session.commit()
         return {
             'message': 'Note deleted'
