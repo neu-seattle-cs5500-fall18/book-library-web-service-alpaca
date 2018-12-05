@@ -59,7 +59,7 @@ class BookDao(Resource):
                 'message': 'No matching book'
             }, 400
 
-        if books is None:
+        if not books:
             return {
                 'message': 'No matching book'
             }, 400
