@@ -23,7 +23,7 @@ class LoanDao(Resource):
     @loan_apis.doc(params={'book_id': 'book id'})
     @loan_apis.doc(params={'due': 'due'})
     @loan_apis.doc(params={'return_date': 'return date'})
-    @loan_apis.doc(params={'returned': 'returned'})
+    @loan_apis.doc(params={'returned': '1 is returned and 0 is NOT returned'})
     @loan_apis.doc('get loan info')
     def get(self):
         '''Get the info of a loan.'''

@@ -24,7 +24,7 @@ class BookDao(Resource):
     @book_apis.doc(params={'start_year': 'Starting publish year of the book'})
     @book_apis.doc(params={'end_year': 'Ending publish year of the book'})
     @book_apis.doc(params={'book_genre': 'book genre'})
-    @book_apis.doc(params={'available': 'available'})
+    @book_apis.doc(params={'available': '1 is available and 0 is NOT available'})
     @book_apis.doc('get book info')
     def get(self):
         '''Search book by parameters'''
