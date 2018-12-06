@@ -9,12 +9,14 @@ class Book(db.Model):
     title = db.Column(db.String, nullable=False)
     year = db.Column(db.Integer, nullable=False)
     genre = db.Column(db.String, nullable=False)
+    available = db.Column(db.Integer, nullable=False)
 
     def __init__(self, book_author, book_title, book_year, book_genre):
         self.author = book_author
         self.title = book_title
         self.year = book_year
         self.genre = book_genre
+        self.available = 1
 
     @property
     def serialize(self):
@@ -23,5 +25,6 @@ class Book(db.Model):
             'author': self.author,
             'title': self.title,
             'year': self.year,
-            'genre': self.genre
+            'genre': self.genre,
+            'available': self.available
         }

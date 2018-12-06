@@ -1,10 +1,10 @@
 from flask_restplus import Namespace, Resource, reqparse
 from application import db
 from application.models.note_model import Note
+from application.models.user_model import User
+from application.models.book_model import Book
 
-import time
-
-note_apis = Namespace('Note APIs',description='Note APIs')
+note_apis = Namespace('Note APIs', description='Note APIs')
 
 parser = reqparse.RequestParser()
 parser.add_argument('note_id', help='note id')
@@ -19,6 +19,7 @@ class NoteDao(Resource):
     @note_apis.doc(params={'note_id': 'note id'})
     @note_apis.doc(params={'book_id': 'book id'})
     @note_apis.doc(params={'user_id': 'user id'})
+    @note_apis.doc(params={'content': 'content'})
     @note_apis.doc('get note info')
     def get(self):
         '''Search note by parameters'''
@@ -26,6 +27,7 @@ class NoteDao(Resource):
         note_id = args['note_id']
         book_id = args['book_id']
         user_id = args['user_id']
+        content = args['content']
         conditions = []
         if note_id is not None:
             conditions.append(Note.id == note_id)
@@ -35,6 +37,9 @@ class NoteDao(Resource):
 
             if user_id is not None:
                 conditions.append(Note.user_id == user_id)
+
+            if content is not None:
+                conditions.append(Note.content == content)
         try:
             notes = db.session.query(Note).filter(*conditions).all()
         except:
@@ -53,7 +58,6 @@ class NoteDao(Resource):
             'message': 'Query successful',
             'notes': notes
         }, 200
-
 
     @note_apis.doc(responses={200: 'Success', 400: 'Error'})
     @note_apis.doc(params={'note_id': 'note id'})
@@ -112,8 +116,7 @@ class NoteDao(Resource):
                 'message': 'At least 1 argument is not provided'
             }, 400
 
-        created_at = time.strftime('%Y/%m/%d', time.localtime())
-        note = Note(book_id, user_id, content, created_at)
+        note = Note(book_id, user_id, content)
         db.session.add(note)
         db.session.commit()
         return {
@@ -122,12 +125,10 @@ class NoteDao(Resource):
 
     @note_apis.doc(responses={200: 'Success', 400: 'Error'})
     @note_apis.doc(params={'note_id': 'note id'})
-    @note_apis.doc(params={'book_id': 'book id'})
-    @note_apis.doc(params={'user_id': 'user id'})
     @note_apis.doc(params={'content': 'Content'})
-    @note_apis.doc('Update a note')
+    @note_apis.doc('Update content of a note')
     def put(self):
-        '''Update a note'''
+        '''Update a content of a  note'''
         args = parser.parse_args()
         try:
             note_id = args['note_id']
@@ -140,33 +141,24 @@ class NoteDao(Resource):
             return {
                 'message': 'Did not pass in a note_id'
             }, 400
-        book_id = args['book_id']
-        user_id = args['user_id']
-        content = args['content']
-        created_at = time.strftime('%Y/%m/%d', time.localtime())
-
         try:
             note = db.session.query(Note).filter(Note.id == note_id).first()
         except:
             return {
-                'message': 'No such book to update'
+                'message': 'No such note to update'
             }, 400
         if note is None:
             return {
                 'message': 'No such note to update'
             }, 400
 
-        if book_id is not None:
-            note.book_id = book_id
+        content = args['content']
+        if content is None:
+            return {
+                'message': 'Did not pass in content to update'
+            }, 400
 
-        if user_id is not None:
-            note.user_id = user_id
-
-        if content is not None:
-            note.content = content
-
-        note.created_at = created_at
-
+        note.content = content
         db.session.commit()
         return {
             'message': 'Note updated'
