@@ -12,10 +12,11 @@ parser.add_argument('book_year', help='publish year of the book')
 parser.add_argument('book_genre', help='book genre')
 parser.add_argument('start_year', help='Starting publish year of the book')
 parser.add_argument('end_year', help='Ending publish year of the book')
+parser.add_argument('available', help='1 is available and 0 is unavailable')
+
 
 @book_apis.route('/')
 class BookDao(Resource):
-
     @book_apis.doc(responses={200: 'Success', 400: 'Error'})
     @book_apis.doc(params={'book_id': 'book id'})
     @book_apis.doc(params={'book_author': 'book author'})
@@ -23,6 +24,7 @@ class BookDao(Resource):
     @book_apis.doc(params={'start_year': 'Starting publish year of the book'})
     @book_apis.doc(params={'end_year': 'Ending publish year of the book'})
     @book_apis.doc(params={'book_genre': 'book genre'})
+    @book_apis.doc(params={'available': '1 is available and 0 is NOT available'})
     @book_apis.doc('get book info')
     def get(self):
         '''Search book by parameters'''
@@ -33,6 +35,7 @@ class BookDao(Resource):
         end_year = args['end_year']
         book_title = args['book_title']
         book_genre = args['book_genre']
+        available = args['available']
         conditions = []
         if book_id is not None:  # if book_id given,should only need 1 condition for the query
             conditions.append(Book.id == book_id)
@@ -52,6 +55,8 @@ class BookDao(Resource):
             if book_genre is not None:
                 conditions.append(Book.genre == book_genre)
 
+            if available is not None:
+                conditions.append(Book.available == available)
         try:
             books = db.session.query(Book).filter(*conditions).all()
         except:
@@ -64,7 +69,8 @@ class BookDao(Resource):
                 'message': 'No matching book'
             }, 400
 
-        books = [{'id': book.id, 'author': book.author, 'title': book.title, 'year': book.year, 'genre': book.genre} for
+        books = [{'id': book.id, 'author': book.author, 'title': book.title, 'year': book.year, 'genre': book.genre,\
+                  'available': book.available} for
                  book in books]
         return {
             'message': 'Query successful',

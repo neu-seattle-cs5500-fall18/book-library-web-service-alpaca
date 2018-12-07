@@ -17,7 +17,8 @@ CREATE TABLE Book (
 	author varchar(255) not null,
 	title varchar(255) not null,
 	year int not null,
-	genre varchar(255) not null
+	genre varchar(255) not null,
+	available int not null DEFAULT 1
 );
 
 CREATE TABLE Note (
@@ -25,7 +26,6 @@ CREATE TABLE Note (
 	book_id int,
 	user_id int,
 	content text,
-	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
 	foreign key (book_id) references Book(id) ON DELETE SET NULL,
 	foreign key (user_id) references LibraryUser(id) ON DELETE SET NULL
 );
@@ -52,7 +52,8 @@ CREATE TABLE Loan (
 	user_id int,
 	book_id int,
 	due date not null,
-	return_date date,
+	return_date date DEFAULT NULL,
+	returned int NOT NULL DEFAULT 0,
 	foreign key (user_id) references LibraryUser(id) ON DELETE SET NULL,
 	foreign key (book_id) references Book(id) ON DELETE SET NULL
 );
