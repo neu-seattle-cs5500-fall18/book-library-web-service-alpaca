@@ -63,7 +63,7 @@ class LoanDao(Resource):
                 'message': 'No Matching Loans'
             }, 400
 
-        loans = [{'loan_id': loan_id, 'user_id': loan.user_id, 'book_id': loan.book_id, 'due': str(loan.due),\
+        loans = [{'loan_id': loan.id, 'user_id': loan.user_id, 'book_id': loan.book_id, 'due': str(loan.due),\
                   'return_date': str(loan.return_date), 'returned': loan.returned} for
                  loan in loans]
         return {
