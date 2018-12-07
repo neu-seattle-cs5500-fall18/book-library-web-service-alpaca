@@ -2,6 +2,7 @@ from application import db
 from application.models.booklist_model import BookList
 from application.models.booklist_model import BookListToBook
 from application.models.book_model import Book
+from application.models.user_model import User
 from flask_restplus import Namespace, Resource, reqparse
 
 import time
@@ -113,6 +114,14 @@ class BookLists(Resource):
         except:
             return {
                 'message': 'Please provide the description of the book list!'
+            }, 401
+
+        existed_user = db.session.query(User)\
+            .filter(User.id == user_id).all()
+
+        if len(existed_user) == 0:
+            return {
+                'message': 'There is no such user!'
             }, 401
 
         existed_book_list = db.session.query(BookList)\
