@@ -100,6 +100,11 @@ class LoanDao(Resource):
                  'message': 'no such loan to delete'
             }, 400
 
+        if loan_to_delete.returned == 0:
+            return {
+                'message': 'Can not delete a loan that has not been returned'
+            }, 400
+
         db.session.query(Loan).filter(Loan.id == loan_id).delete()
         db.session.commit()
         return {
