@@ -38,6 +38,16 @@ class BookLists(Resource):
                 'message': 'Please provide the book list name!'
             }, 400
 
+        existed_book_list = db.session.query(BookList) \
+            .filter(BookList.user_id == user_id) \
+            .filter(BookList.name == list_name) \
+            .all()
+
+        if len(existed_book_list) == 0:
+            return {
+                'message': 'Book list does not exist!'
+            }, 400
+
         books = db.session.query(Book) \
             .join(BookListToBook, Book.id == BookListToBook.book_id) \
             .join(BookList, BookList.id == BookListToBook.book_list_id) \
