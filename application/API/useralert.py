@@ -9,11 +9,10 @@ import time
 
 user_alert_apis = Namespace('User Alert API', description='User Alert API')
 
-@user_alert_apis.route('/useralertlist')
+@user_alert_apis.route('/')
 class UserAlert(Resource):
     @user_alert_apis.doc(responses={200: 'Success', 400: 'Error'})
     @user_alert_apis.doc('Return list of users who needs to return the loaned books')
-
     def get(self):
         curr_time = time.strftime("%Y-%m-%d", time.localtime())
         user_list = db.session.query(Loan)\
@@ -25,6 +24,5 @@ class UserAlert(Resource):
             'message': 'List of users who are required to return their loaned books!',
             'user_id_list': user_id_list
         }
-
 
 
