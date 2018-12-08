@@ -14,10 +14,10 @@ class UserAlert(Resource):
     @user_alert_apis.doc('Return list of users who needs to return the loaned books')
     def get(self):
         curr_time = time.strftime("%Y-%m-%d", time.localtime())
-        user_list = db.session.query(Loan)\
+        loan_list = db.session.query(Loan)\
                     .filter(Loan.due <= curr_time)\
                     .filter(Loan.returned == 0).all()
-        user_id_list = [user.id for user in user_list]
+        user_id_list = [loan.user_id for loan in loan_list]
 
         return {
             'message': 'List of users who are required to return their loaned books!',
@@ -37,9 +37,9 @@ class UserAlert(Resource):
                 'message':'Please provide the user_id!'
             }, 400
         curr_time = time.strftime("%Y-%m-%d", time.localtime())
-        books = db.session.quer(Loan).filter(Loan.user_id == user_id)\
+        loan = db.session.quer(Loan).filter(Loan.user_id == user_id)\
                                         .filter(Loan.due<=curr_time).all()
-        book_ids = [book.id for book in books]
+        book_ids = [loan.book_id for loan in loan]
         if len(book_ids) > 0:
             return {
                 'message': 'This user need to return his loaned book that passed the due already!',
