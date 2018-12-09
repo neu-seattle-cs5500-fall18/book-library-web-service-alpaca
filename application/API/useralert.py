@@ -45,7 +45,7 @@ class UserAlert(Resource):
                 'message':'Please provide the user_id!'
             }, 400
         curr_time = time.strftime("%Y-%m-%d", time.localtime())
-        email = db.session.query(User).filter(User.id == user_id).first()
+        to_send_user = db.session.query(User).filter(User.id == user_id).first()
         raws = db.session.query(Loan, Book).join(Book, Loan.book_id == Book.id)\
                                         .filter(Loan.user_id == user_id)\
                                         .filter(Loan.due<=curr_time).all()
@@ -57,7 +57,7 @@ class UserAlert(Resource):
         if len(book_ids) > 0:
             sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
             from_email = Email("alpaca_library_services@alpaca.com")
-            to_email = Email(email)
+            to_email = Email(to_send_user.email)
             subject = "(DO NOT REPLY) Reminder: Your loaned books need to be returned immediately"
             content = Content("text/plain", "Dear Customer,"+"\n"+
                                             "Please return the following books:"+"\n"+"\n"
