@@ -24,6 +24,9 @@ class UserAlert(Resource):
             'user_id_list': user_id_list
         }
 
+    @user_alert_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @user_alert_apis.doc(params={'user_id': 'user id'})
+    @user_alert_apis.doc('Return list of loaned books that pass the due based on specific user_id. Send email alert to user')
     def post(self):
         args = parser.parse_args()
         try:
