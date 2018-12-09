@@ -46,7 +46,7 @@ class UserAlert(Resource):
             }, 400
         curr_time = time.strftime("%Y-%m-%d", time.localtime())
         email = db.session.query(User).filter(User.id == user_id).first()
-        raws = db.session.query(Loan, Book).join(Loan.book_id == Book.id)\
+        raws = db.session.query(Loan, Book).join(Book, Loan.book_id == Book.id)\
                                         .filter(Loan.user_id == user_id)\
                                         .filter(Loan.due<=curr_time).all()
 
