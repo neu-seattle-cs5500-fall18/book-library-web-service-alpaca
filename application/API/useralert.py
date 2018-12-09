@@ -46,12 +46,12 @@ class UserAlert(Resource):
             }, 400
         curr_time = time.strftime("%Y-%m-%d", time.localtime())
         email = db.session.query(User).filter(User.id == user_id).first()
-        raws = db.session.query(Loan.book_id, Book.title).join(Loan.book_id == Book.id)\
+        raws = db.session.query(Loan, Book).join(Loan.book_id == Book.id)\
                                         .filter(Loan.user_id == user_id)\
                                         .filter(Loan.due<=curr_time).all()
 
-        book_ids = [raw[0] for raw in raws]
-        titles = [raw[1] for raw in raws]
+        book_ids = [raw[0].book_id for raw in raws]
+        titles = [raw[1].title for raw in raws]
         str_title = ','.join(titles)
 
         if len(book_ids) > 0:
