@@ -72,7 +72,7 @@ class UserAlert(Resource):
 
 
             return {
-                'message': 'This user need to return his loaned book that passed the due already!',
+                'message': 'This user need to return his loaned books that passed the due already! Email alert has been sent to him',
                 'book_ids': book_ids
             }, 200
         else:
