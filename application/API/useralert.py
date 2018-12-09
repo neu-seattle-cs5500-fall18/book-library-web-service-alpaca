@@ -1,8 +1,12 @@
 from application import db
 from application.models.user_model import User
 from application.models.loan_model import Loan
+from application.models.book_model import Book
 from flask_restplus import Namespace, Resource, reqparse
 import time
+import sendgrid
+import os
+from sendgrid.helpers.mail import *
 
 
 user_alert_apis = Namespace('User Alert API', description='User Alert API')
@@ -28,6 +32,7 @@ class UserAlert(Resource):
     @user_alert_apis.doc(params={'user_id': 'user id'})
     @user_alert_apis.doc('Return list of loaned books that pass the due based on specific user_id. Send email alert to user')
     def post(self):
+
         args = parser.parse_args()
         try:
             user_id = args['user_id']
@@ -40,10 +45,32 @@ class UserAlert(Resource):
                 'message':'Please provide the user_id!'
             }, 400
         curr_time = time.strftime("%Y-%m-%d", time.localtime())
-        loan = db.session.quer(Loan).filter(Loan.user_id == user_id)\
+        email = db.session.query(User).filter(User.id == user_id).first()
+        raws = db.session.query(Loan.book_id, Book.title).join(Loan.book_id == Book.id)\
+                                        .filter(Loan.user_id == user_id)\
                                         .filter(Loan.due<=curr_time).all()
-        book_ids = [loan.book_id for loan in loan]
+
+        book_ids = [raw[0] for raw in raws]
+        titles = [raw[1] for raw in raws]
+        str_title = ','.join(titles)
+
         if len(book_ids) > 0:
+            sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
+            from_email = Email("alpaca_library_services@alpaca.com")
+            to_email = Email(email)
+            subject = "(DO NOT REPLY) Reminder: Your loaned books need to be returned immediately"
+            content = Content("text/plain", "Dear Customer,"+"\n"+
+                                            "Please return the following books:"+"\n"+"\n"
+                              + str_title +"\n"+"\n"+"\n"+"\n"+"\n"+"\n"
+                              "Best Regards, "+"\n"+"\n"+
+                              "Alpaca Library Service")
+            mail = Mail(from_email, subject, to_email, content)
+            response = sg.client.mail.send.post(request_body=mail.get())
+            print(response.status_code)
+            print(response.body)
+            print(response.headers)
+
+
             return {
                 'message': 'This user need to return his loaned book that passed the due already!',
                 'book_ids': book_ids
