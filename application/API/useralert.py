@@ -17,6 +17,7 @@ class UserAlert(Resource):
     @user_alert_apis.doc(responses={200: 'Success', 400: 'Error'})
     @user_alert_apis.doc('Return list of users who needs to return the loaned books')
     def get(self):
+        '''Return a list of users who need to return the loaned books'''
         curr_time = time.strftime("%Y-%m-%d", time.localtime())
         loan_list = db.session.query(Loan)\
                     .filter(Loan.due <= curr_time)\
@@ -32,7 +33,7 @@ class UserAlert(Resource):
     @user_alert_apis.doc(params={'user_id': 'user id'})
     @user_alert_apis.doc('Return list of loaned books that pass the due based on specific user_id. Send email alert to user')
     def post(self):
-
+        '''Returns list of books that need to be returned by input user_id and sends reminder email to that user'''
         args = parser.parse_args()
         try:
             user_id = args['user_id']
