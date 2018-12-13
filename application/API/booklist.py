@@ -16,8 +16,7 @@ parser.add_argument('description', help='description of the book list')
 
 @book_list_apis.route('/')
 class BookLists(Resource):
-
-    @book_list_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @book_list_apis.doc(responses={200: 'Success', 400: 'Syntax Error', 404: 'No such BookList'})
     @book_list_apis.doc(params={'user_id': 'user id'})
     @book_list_apis.doc(params={'list_name': 'name of the book list'})
     @book_list_apis.doc('get book list info')
@@ -54,7 +53,7 @@ class BookLists(Resource):
         if existed_book_list is None:
             return {
                 'message': 'Book list does not exist!'
-            }, 400
+            }, 404
         book_list_id = existed_book_list.id
         books = db.session.query(Book) \
             .join(BookListToBook, Book.id == BookListToBook.book_id) \
@@ -70,7 +69,7 @@ class BookLists(Resource):
             'books': books
         }, 200
 
-    @book_list_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @book_list_apis.doc(responses={200: 'Success', 400: 'Syntax Error', 404: 'No such BookList'})
     @book_list_apis.doc(params={'user_id': 'user id'})
     @book_list_apis.doc(params={'list_name': 'name of the book list'})
     @book_list_apis.doc('delete a book list')
@@ -112,9 +111,9 @@ class BookLists(Resource):
         else:
             return {
                 'message': 'No such book list!'
-            }, 400
+            }, 404
 
-    @book_list_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @book_list_apis.doc(responses={201: 'Created', 400: 'Syntax Error', 404: 'No such user', 409: 'BookList existed'})
     @book_list_apis.doc(params={'user_id': 'user id'})
     @book_list_apis.doc(params={'list_name': 'name of the book list'})
     @book_list_apis.doc(params={'description': 'description of the book list'})
@@ -127,33 +126,33 @@ class BookLists(Resource):
         except:
             return {
                 'message': 'Please provide your user id!'
-            }, 401
+            }, 400
         if user_id is None:
             return {
                 'message': 'Please provide your user id!'
-            }, 401
+            }, 400
 
         try:
             list_name = args['list_name']
         except:
             return {
                 'message': 'Please provide the book list name!'
-            }, 401
+            }, 400
         if list_name is None:
             return {
                 'message': 'Please provide the book list name!'
-            }, 401
+            }, 400
 
         try:
             description = args['description']
         except:
             return {
                 'message': 'Please provide the description of the book list!'
-            }, 401
+            }, 400
         if description is None:
             return {
                 'message': 'Please provide the description of the book list!'
-            }, 401
+            }, 400
 
         existed_user = db.session.query(User)\
             .filter(User.id == user_id).all()
@@ -161,7 +160,7 @@ class BookLists(Resource):
         if len(existed_user) == 0:
             return {
                 'message': 'There is no such user!'
-            }, 401
+            }, 404
 
         existed_book_list = db.session.query(BookList)\
             .filter(BookList.user_id == user_id)\
@@ -171,26 +170,26 @@ class BookLists(Resource):
         if len(existed_book_list) > 0:
             return {
                 'message': 'The book list of the same name already exists!'
-            }, 401
+            }, 409
 
         created_at = time.strftime('%Y/%m/%d', time.localtime())
         book_list = BookList(user_id, list_name, description, created_at)
         db.session.add(book_list)
         db.session.commit()
         return {
-            'message': 'Create book {} successfully.'.format(list_name)
+            'message': 'Create book list {} successfully.'.format(list_name)
         }, 201
 
 
 @book_list_apis.route('/books')
 class BookListsToBooks(Resource):
-    @book_list_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @book_list_apis.doc(responses={200: 'Success', 400: 'Syntax Error', 404: 'No such Book or BookList'})
     @book_list_apis.doc(params={'user_id': 'user id'})
     @book_list_apis.doc(params={'list_name': 'name of the book list'})
     @book_list_apis.doc(params={'book_id': 'book id'})
     @book_list_apis.doc('delete a book from the book list')
     def delete(self):
-        '''Delete a book from the book list.'''
+        '''Delete a book from the book list'''
         args = parser.parse_args()
         try:
             user_id = args['user_id']
@@ -231,12 +230,12 @@ class BookListsToBooks(Resource):
         except:
             return {
                 'message': 'Target book list does not exist'
-            }, 400
+            }, 404
 
         if target_book_list is None:
             return {
                 'message': 'Target book list does not exist'
-            }, 400
+            }, 404
 
         try:
             target_book_in_the_list = db.session.query(BookListToBook) \
@@ -245,12 +244,12 @@ class BookListsToBooks(Resource):
         except:
             return {
                 'message': 'No such book in the target list'
-            }, 400
+            }, 404
 
         if target_book_in_the_list is None:
             return {
                 'message': 'No such book in the target list'
-            }, 400
+            }, 404
 
         # delete the record from table booklisttobook
         db.session.query(BookListToBook) \
@@ -261,7 +260,7 @@ class BookListsToBooks(Resource):
             'message': 'Book(id:{}) is deleted from {}'.format(book_id, list_name)
         }, 200
 
-    @book_list_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @book_list_apis.doc(responses={200: 'Success', 400: 'Syntax Error', 404: 'Book or BookList not found'})
     @book_list_apis.doc(params={'user_id': 'user id'})
     @book_list_apis.doc(params={'list_name': 'name of the book list'})
     @book_list_apis.doc(params={'book_id': 'book id'})
@@ -283,7 +282,7 @@ class BookListsToBooks(Resource):
         if target_user is None:
             return {
                 'message': 'The targeted user does not exist'
-            }, 400
+            }, 404
 
         try:
             list_name = args['list_name']
@@ -310,7 +309,7 @@ class BookListsToBooks(Resource):
         if book_to_add is None:
             return {
                 'message': 'The book you are trying to add does not exist'
-            }, 400
+            }, 404
 
         book_list = db.session.query(BookList) \
             .filter(BookList.user_id == user_id) \
@@ -319,7 +318,7 @@ class BookListsToBooks(Resource):
         if book_list is None:
             return {
                 'message': 'Targeted book list does not exist'
-            }, 400
+            }, 404
 
         record = BookListToBook(book_list.id, book_id)
         db.session.add(record)

@@ -17,7 +17,7 @@ parser.add_argument('available', help='1 is available and 0 is unavailable')
 
 @book_apis.route('/')
 class BookDao(Resource):
-    @book_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @book_apis.doc(responses={200: 'Found matching books', 404: 'No matching books'})
     @book_apis.doc(params={'book_id': 'book id'})
     @book_apis.doc(params={'book_author': 'book author'})
     @book_apis.doc(params={'book_title': 'book title'})
@@ -62,12 +62,12 @@ class BookDao(Resource):
         except:
             return {
                 'message': 'No matching book'
-            }, 400
+            }, 404
 
         if not books:
             return {
                 'message': 'No matching book'
-            }, 400
+            }, 404
 
         books = [{'id': book.id, 'author': book.author, 'title': book.title, 'year': book.year, 'genre': book.genre,\
                   'available': book.available} for
@@ -78,7 +78,7 @@ class BookDao(Resource):
         }, 200
 
 
-    @book_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @book_apis.doc(responses={200: 'Deleted', 400: 'Syntax error', 404: 'No such book to delete'})
     @book_apis.doc(params={'book_id': 'book id'})
     @book_apis.doc('Delete book')
     def delete(self):
@@ -93,7 +93,7 @@ class BookDao(Resource):
 
         if book_id is None:
             return {
-                'message': 'Did not pass in a book_id'
+                'message': 'Did not give book_id'
             }, 400
 
         try:
@@ -101,11 +101,11 @@ class BookDao(Resource):
         except:
             return {
                 'message': 'no such book to delete'
-            }, 400
+            }, 404
         if book_to_delete is None:
             return {
                 'message': 'no such book to delete'
-            }, 400
+            }, 404
 
         db.session.query(Book).filter(Book.id == book_id).delete()
         db.session.commit()
@@ -114,7 +114,7 @@ class BookDao(Resource):
         }, 200
 
 
-    @book_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @book_apis.doc(responses={201: 'Book added', 400: 'Syntax error'})
     @book_apis.doc(params={'book_author': 'book author'})
     @book_apis.doc(params={'book_title': 'book title'})
     @book_apis.doc(params={'book_year': 'book publish year'})
@@ -142,9 +142,9 @@ class BookDao(Resource):
         db.session.commit()
         return {
             'message': 'Book created'
-        }, 200
+        }, 201
 
-    @book_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @book_apis.doc(responses={200: 'Success', 400: 'Syntax error', 404: 'No such book to update'})
     @book_apis.doc(params={'book_id': 'book id'})
     @book_apis.doc(params={'book_author': 'book author'})
     @book_apis.doc(params={'book_title': 'book title'})
@@ -158,7 +158,7 @@ class BookDao(Resource):
             book_id = args['book_id']
         except:
             return {
-                'message': 'Get book id failed'
+                'message': 'Did not pass in a book_id'
             }, 400
 
         if book_id is None:
@@ -176,12 +176,12 @@ class BookDao(Resource):
         except:
             return {
                 'message': 'No such book to update'
-            }, 400
+            }, 404
 
         if book is None:
             return {
                 'message': 'No such book to update'
-            }, 400
+            }, 404
 
         if book_author is not None:
             book.author = book_author
