@@ -3,7 +3,7 @@ from application import db
 from application.models.loan_model import Loan
 from application.models.book_model import Book
 from application.models.user_model import User
-import time
+
 
 loan_apis = Namespace('Loan APIs', description='Loan APIs')
 
@@ -17,7 +17,7 @@ parser.add_argument('returned', help='1 is returned and 0 is not returned')
 
 @loan_apis.route('/')
 class LoanDao(Resource):
-    @loan_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @loan_apis.doc(responses={200: 'Success', 404: 'No matching note'})
     @loan_apis.doc(params={'loan_id': 'loan id'})
     @loan_apis.doc(params={'user_id': 'user id'})
     @loan_apis.doc(params={'book_id': 'book id'})
@@ -57,11 +57,11 @@ class LoanDao(Resource):
         except:
             return {
                 'message': 'No Matching Loans'
-            }, 400
+            }, 404
         if not loans:
             return {
                 'message': 'No Matching Loans'
-            }, 400
+            }, 404
 
         loans = [{'loan_id': loan.id, 'user_id': loan.user_id, 'book_id': loan.book_id, 'due': str(loan.due),\
                   'return_date': str(loan.return_date), 'returned': loan.returned} for
@@ -71,7 +71,7 @@ class LoanDao(Resource):
             'loans': loans
         }, 200
 
-    @loan_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @loan_apis.doc(responses={200: 'Success', 400: 'Syntax error', 403: 'Forbid to delete not returned loan', 404: 'No such loan'})
     @loan_apis.doc(params={'loan_id': 'loan id'})
     @loan_apis.doc('Delete loan')
     def delete(self):
@@ -93,17 +93,17 @@ class LoanDao(Resource):
         except:
             return {
                 'message': 'no such loan to delete'
-            }, 400
+            }, 404
 
         if loan_to_delete is None:
             return {
                  'message': 'no such loan to delete'
-            }, 400
+            }, 404
 
         if loan_to_delete.returned == 0:
             return {
                 'message': 'Can not delete a loan that has not been returned'
-            }, 400
+            }, 403
 
         db.session.query(Loan).filter(Loan.id == loan_id).delete()
         db.session.commit()
@@ -111,7 +111,7 @@ class LoanDao(Resource):
             'message': 'Loan deleted'
         }, 200
 
-    @loan_apis.doc(responses={200: 'Success', 400:'Error'})
+    @loan_apis.doc(responses={201: 'Loan created', 400: 'Syntax error', 403: 'Forbid to borrow an unavailable book', 404: 'No such user or book'})
     @loan_apis.doc(params={'user_id': 'user id'})
     @loan_apis.doc(params={'book_id': 'book id'})
     @loan_apis.doc(params={'due': 'due'})
@@ -125,7 +125,7 @@ class LoanDao(Resource):
             due = args['due']
         except:
             return {
-            'message': 'invaild input arguments!'
+            'message': 'At least 1 argument is not provided'
         }, 400
 
         if user_id is None or book_id is None or due is None:
@@ -138,28 +138,28 @@ class LoanDao(Resource):
         except:
             return {
                 'message': 'No such user'
-            }, 400
+            }, 404
 
         if user is None:
             return {
                 'message': 'No such user'
-            }, 400
+            }, 404
         try:
             book = db.session.query(Book).filter(Book.id == book_id).first()
         except:
             return {
                 'message': 'No such book to loan'
-            }, 400
+            }, 404
 
         if book is None:
             return {
                 'message': 'No such book to loan'
-            }, 400
+            }, 404
 
         if book.available == 0:
             return {
                 'message': 'This book is not available'
-            }, 400
+            }, 403
 
         book.available = 0  # mark book as loaned out
         loan = Loan(user_id, book_id, due)
@@ -167,9 +167,9 @@ class LoanDao(Resource):
         db.session.commit()
         return {
             'message': 'Loan created'
-        }, 200
+        }, 201
 
-    @loan_apis.doc(responses={200: 'Success', 400:'Error'})
+    @loan_apis.doc(responses={200: 'Success', 400: 'Syntax error', 404: 'No such loan or book'})
     @loan_apis.doc(params={'loan_id': 'loan id'})
     @loan_apis.doc(params={'due': 'due'})
     @loan_apis.doc(params={'return_date': 'return date'})
@@ -197,11 +197,11 @@ class LoanDao(Resource):
         except:
             return {
                 'message': 'No such loan to update'
-            }, 400
+            }, 404
         if loan is None:
             return {
                 'message': 'No such loan to update'
-            }, 400
+            }, 404
 
         if due is not None:
             loan.due = due
@@ -213,11 +213,11 @@ class LoanDao(Resource):
             except:
                 return {
                     'message': 'Loaned book was deleted'
-                }, 400
+                }, 404
             if book is None:
                 return {
                     'message': 'Loaned book was deleted'
-                }, 400
+                }, 404
             loan.return_date = return_date
             loan.returned = 1
             book.available = 1  # mark book as returned

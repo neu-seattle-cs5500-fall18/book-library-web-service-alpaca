@@ -14,7 +14,7 @@ parser = reqparse.RequestParser()
 parser.add_argument('user_id', help='user id')
 @user_alert_apis.route('/')
 class UserAlert(Resource):
-    @user_alert_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @user_alert_apis.doc(responses={200: 'Success'})
     @user_alert_apis.doc('Return list of users who needs to return the loaned books')
     def get(self):
         '''Return a list of users who need to return the loaned books'''
@@ -27,9 +27,9 @@ class UserAlert(Resource):
         return {
             'message': 'List of users who are required to return their loaned books!',
             'user_id_list': user_id_list
-        }
+        }, 200
 
-    @user_alert_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @user_alert_apis.doc(responses={200: 'Success', 204: 'No books to return', 400: 'Syntax Error'})
     @user_alert_apis.doc(params={'user_id': 'user id'})
     @user_alert_apis.doc('Return list of loaned books that pass the due based on specific user_id. Send email alert to user')
     def post(self):
@@ -39,11 +39,11 @@ class UserAlert(Resource):
             user_id = args['user_id']
         except:
             return {
-                'message':'Please provide the user_id!'
+                'message': 'Please provide the user_id!'
             }, 400
         if user_id is None:
             return {
-                'message':'Please provide the user_id!'
+                'message': 'Please provide the user_id!'
             }, 400
         curr_time = time.strftime("%Y-%m-%d", time.localtime())
         to_send_user = db.session.query(User).filter(User.id == user_id).first()
@@ -72,7 +72,6 @@ class UserAlert(Resource):
             print(response.body)
             print(response.headers)
 
-
             return {
                 'message': 'This user need to return his loaned books that passed the due already! Email alert has been sent to him',
                 'book_ids': book_ids
@@ -80,5 +79,5 @@ class UserAlert(Resource):
         else:
             return {
                 'message': 'This user has returned all loaned books in time!'
-            }, 200
+            }, 204
 

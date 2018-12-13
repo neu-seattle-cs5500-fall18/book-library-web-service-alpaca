@@ -15,7 +15,7 @@ parser.add_argument('content', help='Note content')
 
 @note_apis.route('/')
 class NoteDao(Resource):
-    @note_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @note_apis.doc(responses={200: 'Success', 404: 'No matching notes'})
     @note_apis.doc(params={'note_id': 'note id'})
     @note_apis.doc(params={'book_id': 'book id'})
     @note_apis.doc(params={'user_id': 'user id'})
@@ -44,13 +44,13 @@ class NoteDao(Resource):
             notes = db.session.query(Note).filter(*conditions).all()
         except:
             return{
-                'message': 'No Matching notes'
-            }, 400
+                'message': 'No matching notes'
+            }, 404
 
         if not notes:
             return {
-                'message': 'No Matching notes'
-            }, 400
+                'message': 'No matching notes'
+            }, 404
 
         notes = [{'note_id': note.id, 'book_id': note.book_id, 'user_id': note.user_id, 'content': note.content} for
                  note in notes]
@@ -59,7 +59,7 @@ class NoteDao(Resource):
             'notes': notes
         }, 200
 
-    @note_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @note_apis.doc(responses={200: 'Success', 400: 'Syntax error', 404: 'No such note to delete'})
     @note_apis.doc(params={'note_id': 'note id'})
     @note_apis.doc('Delete note')
     def delete(self):
@@ -82,11 +82,11 @@ class NoteDao(Resource):
         except:
             return {
                 'message': 'no such note to delete'
-            }, 400
+            }, 404
         if note_to_delete is None:
             return {
                 'message': 'no such note to delete'
-            }, 400
+            }, 404
 
         db.session.query(Note).filter(Note.id == note_id).delete()
         db.session.commit()
@@ -94,7 +94,7 @@ class NoteDao(Resource):
             'message': 'Note deleted'
         }, 200
 
-    @note_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @note_apis.doc(responses={201: 'Note added', 400: 'Syntax error', 404: 'Not found user or book'})
     @note_apis.doc(params={'book_id': 'book id'})
     @note_apis.doc(params={'user_id': 'user id'})
     @note_apis.doc(params={'content': 'Content'})
@@ -115,20 +115,42 @@ class NoteDao(Resource):
             return {
                 'message': 'At least 1 argument is not provided'
             }, 400
+        try:
+            book = db.session.query(Book).filter(Book.id == book_id).first()
+        except:
+            return {
+                'message': 'No such book'
+            }, 404
+        if book is None:
+            return {
+                'message': 'No such book'
+            }, 404
+
+        try:
+            user = db.session.query(User).filter(User.id == user_id).first()
+        except:
+            return {
+                'message': 'No such user'
+            }, 404
+
+        if user is None:
+            return {
+                'message': 'No such user'
+            }, 404
 
         note = Note(book_id, user_id, content)
         db.session.add(note)
         db.session.commit()
         return {
             'message': 'note added'
-        }, 200
+        }, 201
 
-    @note_apis.doc(responses={200: 'Success', 400: 'Error'})
+    @note_apis.doc(responses={200: 'Success', 400: 'Syntax error', 404: 'No matching note'})
     @note_apis.doc(params={'note_id': 'note id'})
     @note_apis.doc(params={'content': 'Content'})
     @note_apis.doc('Update content of a note')
     def put(self):
-        '''Update a content of a  note'''
+        '''Update a content of a note'''
         args = parser.parse_args()
         try:
             note_id = args['note_id']
@@ -146,11 +168,11 @@ class NoteDao(Resource):
         except:
             return {
                 'message': 'No such note to update'
-            }, 400
+            }, 404
         if note is None:
             return {
                 'message': 'No such note to update'
-            }, 400
+            }, 404
 
         content = args['content']
         if content is None:
